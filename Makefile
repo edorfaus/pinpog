@@ -1,5 +1,9 @@
 VERSION=1.0
 
+.PHONY: run
+run: pinpog
+	qemu-system-i386 -drive file=pinpog,format=raw,index=0,media=disk
+
 .PHONY: all
 all: pinpog
 	qemu-system-i386 -monitor stdio pinpog

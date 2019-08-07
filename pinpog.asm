@@ -1,4 +1,6 @@
     org 0x7C00
+    bits 16
+    cpu 386
 %define WIDTH 320
 %define HEIGHT 200
 %define COLUMNS 40
@@ -51,18 +53,57 @@ struc GameState
 endstruc
 
 entry:
+    mov ax, 0xb800
+    mov fs, ax
+	xor di, di
+
+	mov cx, 80*25/4
+	mov dx, 0x201
+
+;	out dx, al
+loop:
+hlt
+	in al, dx
+
+	mov ah, al
+
+	mov byte [fs:di+6], 32
+
+	and al, 0x7
+	add al, '0'
+	mov byte [fs:di+4], al
+
+	mov al, ah
+	shr al, 3
+	and al, 0x7
+	add al, '0'
+	mov byte [fs:di+2], al
+
+	shr ah, 6
+	and ah, 0x7
+	add ah, '0'
+	mov byte [fs:di], ah
+
+	add di, 8
+
+	loop loop
+a:
+	hlt
+jmp a
+
+
     ; VGA mode 0x13
     ; 320x200 256 colors
     mov ax, 0x13
     int 0x10
 
-    xor ax, ax
-    mov es, ax
-    mov ds, ax
-    mov cx, GameState_size
-    mov si, initial_game_state
-    mov di, game_state
-    rep movsb
+;    xor ax, ax
+;    mov es, ax
+;    mov ds, ax
+;    mov cx, GameState_size
+;    mov si, initial_game_state
+;    mov di, game_state
+;    rep movsb
 
     mov dword [0x0070], draw_frame
 .loop:
